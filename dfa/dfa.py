@@ -8,12 +8,12 @@ from machines import *
 
 
 class DFAInterp:
-    def __init__(self, m: dict):
-        self._alphabet = m["∑"]
-        self._start = m["q"]
+    def __init__(self, dfa: dict):
+        self._alphabet = dfa["∑"]
+        self._start = dfa["q"]
         self._current = self._start
-        self._accept_states = m["F"]
-        self._delta_table = m["∂"]
+        self._accept_states = dfa["F"]
+        self._delta_table = dfa["∂"]
         self.counter = 0
         self._buffer = None
         self.accept_status = False
@@ -23,19 +23,31 @@ class DFAInterp:
 
     def delta(self, r):
         """
-        :param r: input
-        :return: str -> state
+            Performs a transition for a given input r.
         """
-        if r not in self._alphabet:
-            raise RuntimeError("Input: {} not in alphabet".format(r))
 
+        # Throws if r is not in alphabet
+        self._is_in_alphabet(r)
+
+        # Gets the transitions of the current state
         curr_trans = self._delta_table.get(self._current)
 
         if curr_trans:
             self._current = next(filter(lambda t: t[0] == r, curr_trans))[1]
             self.counter += 1
 
+    def _is_in_alphabet(self, r):
+        """
+            Checks if the given input is in the alphabet
+        """
+        if r not in self._alphabet:
+            raise RuntimeError("Input: {} not in alphabet".format(r))
+
     def run(self, w, report=True):
+        """
+            Calls the transition function for each char of the input w and
+            report the state of the machine by default.
+        """
         self._buffer = w
 
         for w_p in self._buffer:
@@ -47,9 +59,15 @@ class DFAInterp:
             self.report()
 
     def is_in_accept_state(self):
+        """
+            Check if the current state is one of the acceptance state.
+        """
         return self._current in self._accept_states
 
     def report(self):
+        """
+            Prints the current status of the machine.
+        """
         print("------ Machine Summary ------")
         msg = "After {} transitions, the machine {} the input:\n{}"
 
