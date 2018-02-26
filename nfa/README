@@ -1,0 +1,5 @@
+Implementa compiler from NFA to DFAs.
+
+First, I need to define a NFA and see what is he differences are.
+
+Then start translation.
